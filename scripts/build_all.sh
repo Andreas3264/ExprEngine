@@ -11,7 +11,7 @@ set -e # stop on error
 
 build_proof() {
 	echo "building: $PROOFS_DIR/$1"
-	java -cp "$BIN_DIR" main/Main ExprEngine -in "$PROOFS_DIR"/$1 -out "$MACHINE_PROOF_DIR"/$2 -axi "$AXIOMS_FILE" -macdir "$MACHINE_PROOF_DIR"
+	java -cp "$BIN_DIR" main/ProofGeneratorMain ExprEngine -in "$PROOFS_DIR"/$1 -out "$MACHINE_PROOF_DIR"/$2 -axi "$AXIOMS_FILE" -macdir "$MACHINE_PROOF_DIR"
 }
 
 mkdir -p "$MACHINE_PROOF_DIR"

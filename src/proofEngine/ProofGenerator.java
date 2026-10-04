@@ -88,7 +88,7 @@ public class ProofGenerator {
 		{
 			for(Node loc : allLoc)
 			{
-				Node res = Verifier.tryApplyRuleAt(src, rule, loc);
+				Node res = Verifier.tryApplyTransform(src, new Transform(loc, rule));
 				
 				if(res != null)
 				{
@@ -123,7 +123,7 @@ public class ProofGenerator {
 		{
 			for(Node loc : allLoc)
 			{
-				Node res = Verifier.tryApplyRuleAt(src, rule, loc);
+				Node res = Verifier.tryApplyTransform(src, new Transform(loc, rule));
 				
 				if(res != null)
 				{

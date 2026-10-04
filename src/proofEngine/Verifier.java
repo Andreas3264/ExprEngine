@@ -5,13 +5,46 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import proofEngine.objects.Node;
-import proofEngine.objects.Proof;
-import proofEngine.objects.Rule;
-import proofEngine.objects.Transform;
+import proofEngine.objects.*;
 
 public class Verifier {
 
+	/*
+	 * Checks if a proof is valid
+	 */
+	public static boolean isValidProof(Proof proof, List<Rule> ruleWriteback)
+	{
+		Node current = proof.rule.from;
+		for(Transform t : proof.transforms)
+		{
+			Rule rule = t.rule;
+			boolean isRuleContained = false;
+			for(Rule r : ruleWriteback)
+				if(isEqual(rule.toNode(), r.toNode()))
+					isRuleContained = true;
+			
+			if(!isRuleContained)
+				ruleWriteback.add(rule);
+			
+			Node next = tryApplyTransform(current, t);
+			
+			if(next == null)
+				return false;
+			
+			current = next;
+		}
+		return isEqual(current, proof.rule.to);
+	}
+	
+	/*
+	 * Gets the resulting expression by applying a transform
+	 * Returns null if transform can not be applied
+	 */
+	public static Node tryApplyTransform(Node exp, Transform transform)
+	{
+		return tryApplyRuleAt(exp, transform.rule, transform.loc);
+	}
+	
 	/*
 	 * Checks if two nodes are exactly the same
 	 */
@@ -43,7 +76,6 @@ public class Verifier {
 			}
 			return true;
 		}
-		
 		return false;
 	}
 	
@@ -51,7 +83,7 @@ public class Verifier {
 	 * Checks if a expression can be matched to a pattern
 	 * Adds all aliases to a map of aliases
 	 */
-	public static boolean isMatch(Node exp, Node pat, Map<String, Node> aliases)
+	private static boolean isMatch(Node exp, Node pat, Map<String, Node> aliases)
 	{
 		//check if pattern tries to match any ?x etc
 		if(pat.label != null)
@@ -100,7 +132,7 @@ public class Verifier {
 	/*
 	 * Constructs a new expression from a pattern and map of aliases
 	 */
-	public static Node expressionFromPattern(Node pat, Map<String, Node> aliases)
+	private static Node expressionFromPattern(Node pat, Map<String, Node> aliases)
 	{
 		if(pat.label != null)
 		{
@@ -124,7 +156,6 @@ public class Verifier {
 		}
 	}
 	
-	
 	/*
 	 * Gets the resulting expression by applying a rule
 	 * Returns null if rule can not be matched
@@ -141,7 +172,7 @@ public class Verifier {
 	 * Gets the resulting expression by applying a rule at a location
 	 * Returns null if rule can not be matched
 	 */
-	public static Node tryApplyRuleAt(Node exp, Rule rule, Node loc)
+	private static Node tryApplyRuleAt(Node exp, Rule rule, Node loc)
 	{
 		if(loc.label != null) {
 			if(loc.label.equals("*")) {
@@ -170,45 +201,5 @@ public class Verifier {
 			}
 			return node;
 		}
-	}
-	
-	/*
-	 * Gets the resulting expression by applying a transform
-	 * Returns null if transform can not be applied
-	 */
-	public static Node tryApplyTransform(Node exp, Transform transform)
-	{
-		return tryApplyRuleAt(exp, transform.rule, transform.loc);
-	}
-	
-	/*
-	 * Checks if a proof is valid
-	 */
-	public static boolean isValidProof(Proof proof, List<Rule> validRules)
-	{
-		Node current = proof.src;
-		System.out.println(current);
-		for(Transform t : proof.transforms)
-		{
-			boolean isValidRule = false;
-			for(Rule r : validRules)
-			{
-				if(isEqual(r.toNode(), t.rule.toNode()))
-					isValidRule = true;
-			}
-			
-			if(!isValidRule)
-				return false;
-			
-			Node next = tryApplyTransform(current, t);
-			
-			if(next == null)
-				return false;
-			
-			System.out.println(next);
-			current = next;
-		}
-		
-		return isEqual(current, proof.dst);
 	}
 }

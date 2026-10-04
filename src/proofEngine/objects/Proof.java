@@ -5,23 +5,20 @@ import java.util.List;
 
 public class Proof {
 
-	public final Node src;
-	public final Node dst;
+	public final Rule rule;
 	public final List<Transform> transforms;
 	
-	public Proof(Node src, Node dst, List<Transform> transforms)
+	public Proof(Rule rule, List<Transform> transforms)
 	{
-		this.src = src;
-		this.dst = dst;
+		this.rule = rule;
 		this.transforms = transforms;
 	}
 	
 	public Proof(Node node)
 	{
-		this.src = node.nodes.get(0);
-		this.dst = node.nodes.get(1);
+		this.rule = new Rule(node.nodes.get(0));
 		this.transforms = new ArrayList<Transform>();
-		for(Node t : node.nodes.get(2).nodes)
+		for(Node t : node.nodes.get(1).nodes)
 		{
 			transforms.add(new Transform(t));
 		}
@@ -37,9 +34,7 @@ public class Proof {
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("(\n");
-		sb.append(src);
-		sb.append("\n");
-		sb.append(dst);
+		sb.append(rule);
 		sb.append("\n(\n");
 		for(Transform t : transforms) 
 		{

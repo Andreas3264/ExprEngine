@@ -5,15 +5,15 @@ import java.util.List;
 
 import proofEngine.ProofGenerator;
 import proofEngine.Utility;
-import proofEngine.objects.Node;
-import proofEngine.objects.Proof;
-import proofEngine.objects.Rule;
+import proofEngine.objects.*;
 
-public class Main {
+public class ProofGeneratorMain {
 	
 	public static Proof tryGenerateProof(List<Node> exprs, List<Rule> axioms)
 	{
-		return new Proof(exprs.get(0), exprs.get(exprs.size()-1), ProofGenerator.tryGetTransforms(exprs, axioms));
+		Rule rule = new Rule(exprs.get(0), exprs.get(exprs.size()-1));
+		List<Transform> transforms = ProofGenerator.tryGetTransforms(exprs, axioms);
+		return new Proof(rule, transforms);
 	}
 	
 	public static void buildProof(String axiomFile, String machineProofsPath, String input, String output) throws IOException
@@ -23,8 +23,7 @@ public class Main {
 		for(Node n : machineProofs)
 		{
 			Proof p = new Proof(n);
-			//TODO: verify proof
-			axioms.add(new Rule(p.src, p.dst));
+			axioms.add(p.rule);
 		}
 		
 		Node proofToProve = Utility.nodeFromFile(input);
@@ -65,7 +64,6 @@ public class Main {
 			}
 			else if(arg.equals("ExprEngine"))
 			{
-				machineProofFolder = args[i+1];
 			}
 			else 
 			{
